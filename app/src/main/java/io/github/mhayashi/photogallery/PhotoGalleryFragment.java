@@ -27,12 +27,18 @@ public class PhotoGalleryFragment extends Fragment {
 
     GridView mGridView;
     ArrayList<GalleryItem> mItems;
+    ThumbnailDownloader<ImageView> mThumbnailThread;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         new FetchItemsTask().execute();
+
+        mThumbnailThread = new ThumbnailDownloader<ImageView>();
+        mThumbnailThread.start();
+        mThumbnailThread.getLooper();
+        Log.i(TAG, "Background thread started");
     }
 
     @Override
@@ -41,6 +47,13 @@ public class PhotoGalleryFragment extends Fragment {
         mGridView = (GridView)v.findViewById(R.id.gridView);
         setupAdapter();
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mThumbnailThread.quit();
+        Log.i(TAG, "Background thread destroyed");
     }
 
     void setupAdapter() {
@@ -81,6 +94,9 @@ public class PhotoGalleryFragment extends Fragment {
 
             ImageView imageView = (ImageView)convertView.findViewById(R.id.gallery_item_imageView);
             imageView.setImageResource(R.drawable.skull);
+            GalleryItem item = getItem(position);
+            mThumbnailThread.queueThumbnail(imageView, item.getUrl());
+
             return convertView;
         }
     }
