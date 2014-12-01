@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class FlickrFetcher {
     public static final String TAG = "FlickrFetcher";
-    private static final String ENDPOINT = "http://api.filckr.com/services/rest/";
+    private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
     private static final String API_KEY = "654f530215828d8f23f0dcb03167ba27";
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String PARAM_EXTRAS = "extras";
@@ -63,6 +63,7 @@ public class FlickrFetcher {
             String url = Uri.parse(ENDPOINT)
                             .buildUpon()
                             .appendQueryParameter("method", METHOD_GET_RECENT)
+                            .appendQueryParameter("api_key", API_KEY)
                             .appendQueryParameter(PARAM_EXTRAS, EXTRA_SMALL_URL)
                             .build().toString();
             String xmlString = getUrl(url);
@@ -94,6 +95,8 @@ public class FlickrFetcher {
                 item.setUrl(smallUrl);
                 items.add(item);
             }
+
+            eventType = parser.next();
         }
     }
 }
