@@ -41,7 +41,7 @@ import javax.crypto.SealedObject;
 /**
  * Created by Masahiro Hayashi on 12/1/14.
  */
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
     private static final String TAG = "PhotoGalleryFragment";
 
     GridView mGridView;
