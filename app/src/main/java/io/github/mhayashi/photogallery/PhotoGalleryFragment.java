@@ -1,8 +1,10 @@
 package io.github.mhayashi.photogallery;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.AndroidCharacter;
@@ -35,7 +37,15 @@ public class PhotoGalleryFragment extends Fragment {
         setRetainInstance(true);
         new FetchItemsTask().execute();
 
-        mThumbnailThread = new ThumbnailDownloader<ImageView>();
+        mThumbnailThread = new ThumbnailDownloader(new Handler());
+        mThumbnailThread.setListener(new ThumbnailDownloader.Listener<ImageView>() {
+            @Override
+            public void onThumbnailDownloaded(ImageView imageView, Bitmap thumbnail) {
+                if (isVisible()) {
+                    imageView.setImageBitmap(thumbnail);
+                }
+            }
+        });
         mThumbnailThread.start();
         mThumbnailThread.getLooper();
         Log.i(TAG, "Background thread started");
@@ -54,6 +64,12 @@ public class PhotoGalleryFragment extends Fragment {
         super.onDestroy();
         mThumbnailThread.quit();
         Log.i(TAG, "Background thread destroyed");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mThumbnailThread.clearQueue();
     }
 
     void setupAdapter() {
